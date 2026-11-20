@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting availability</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; }
+  th, td { border: 1px solid #ccc; text-align: center; padding: 0; }
+  th { background: #f4f4f4; padding: .4rem; font-size: .85rem; }
+  td label { display: block; padding: .5rem; cursor: pointer; }
+  td input { width: 1.1rem; height: 1.1rem; cursor: pointer; }
+  td:has(input:checked) { background: #d5f5e3; }
+  button { padding: .6rem 1.4rem; font-size: 1rem; }
+  #msg { margin-top: 1rem; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Meeting availability</h1>
+<p>Tick every one-hour slot that suits you (UK time). You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
+<div id="grid"></div>
+<button id="submit">Submit</button>
+<p id="msg"></p>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjF3pVDkJITWx1N6-wnQAYi52Qim0fKEOyrk2GyjW557zGy0mMM1Pk8UNU3t30veCT/exec';
+const HOURS = [9, 10, 11, 12, 13, 14, 15, 16];   // meeting start times
+
+const params = new URLSearchParams(location.search);
+const token = params.get('t');
+const start = params.get('start');
+const msg = document.getElementById('msg');
+const pad = n => String(n).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+if (!token || !/^\d{4}-\d{2}-\d{2}$/.test(start || '')) {
+  document.getElementById('submit').hidden = true;
+  msg.textContent = 'This link is incomplete. Please use the link you were sent.';
+} else {
+  const [y, m, d] = start.split('-').map(Number);
+  const weeks = [[], []];
+  for (let i = 0; i < 14; i++) {
+    const day = new Date(y, m - 1, d + i);
+    if (day.getDay() !== 0 && day.getDay() !== 6) weeks[i < 7 ? 0 : 1].push(day);
+  }
+
+  const grid = document.getElementById('grid');
+  for (const days of weeks) {
+    if (!days.length) continue;
+    let html = '<tr><th></th>' + days.map(day =>
+      `<th>${day.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</th>`
+    ).join('') + '</tr>';
+    for (const h of HOURS) {
+      html += `<tr><th>${pad(h)}:00–${pad(h + 1)}:00</th>` + days.map(day =>
+        `<td><label><input type="checkbox" value="${iso(day)} ${pad(h)}:00"></label></td>`
+      ).join('') + '</tr>';
+    }
+    const table = document.createElement('table');
+    table.innerHTML = html;
+    grid.appendChild(table);
+  }
+
+  document.getElementById('submit').addEventListener('click', async () => {
+    const slots = [...document.querySelectorAll('#grid input:checked')].map(i => i.value);
+    if (!slots.length && !confirm('No slots ticked. Submit anyway?')) return;
+    msg.textContent = 'Sending…';
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },  // avoids a CORS preflight Apps Script can't answer
+        body: JSON.stringify({ token, slots })
+      });
+      const out = await res.json();
+      msg.textContent = out.ok ? 'Thanks, your availability has been recorded.' : `Error: ${out.error}`;
+    } catch {
+      msg.textContent = 'Could not send. Please try again, or email me your times.';
+    }
+  });
+}
+</script>
+</body>
+</html>
+
