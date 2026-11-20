@@ -29,7 +29,8 @@ const HOURS = [9, 10, 11, 12, 13, 14, 15, 16];   // meeting start times
 
 const params = new URLSearchParams(location.search);
 const token = params.get('t');
-const start = params.get('start');
+const DEFAULT_START = '2026-11-30';
+const start = params.get('start') || DEFAULT_START;
 const msg = document.getElementById('msg');
 const pad = n => String(n).padStart(2, '0');
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
