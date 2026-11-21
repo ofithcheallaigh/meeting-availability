@@ -17,8 +17,8 @@
 </style>
 </head>
 <body>
-<h1>Meeting availability</h1>
-<p>Tick every one-hour slot that suits you (UK time). You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
+<h1>PhD Update Meeting Availability</h1>
+<p>Tick every one-hour slot that suits you. You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
 <div id="grid"></div>
 <button id="submit">Submit</button>
 <p id="msg"></p>
@@ -73,9 +73,9 @@ if (!token || !/^\d{4}-\d{2}-\d{2}$/.test(start || '')) {
         body: JSON.stringify({ token, slots })
       });
       const out = await res.json();
-      msg.textContent = out.ok ? 'Thanks, your availability has been recorded.' : `Error: ${out.error}`;
+      msg.textContent = out.ok ? 'Thanks, your availability has been recorded. I hope you have a good day.' : `Error: ${out.error}`;
     } catch {
-      msg.textContent = 'Could not send. Please try again, or email me your times.';
+      msg.textContent = 'Could not send. Please try again, or email me and tell me this thing is broken.';
     }
   });
 }
