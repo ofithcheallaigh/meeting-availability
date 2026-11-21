@@ -107,7 +107,7 @@ if (!token || !/^\d{4}-\d{2}-\d{2}$/.test(start || '')) {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },  // avoids a CORS preflight Apps Script can't answer
-        JSON.stringify({ token, slots, note: document.getElementById('note').value })
+        body: JSON.stringify({ token, slots, note: document.getElementById('note').value })
       });
       const out = await res.json();
       msg.textContent = out.ok ? 'Thanks, your availability has been recorded. I hope you have a good day.' : `Error: ${out.error}`;
