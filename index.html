@@ -19,6 +19,7 @@
 </head>
 <body>
 <h1>PhD Update Meeting Availability</h1>
+<p id="greeting"></p>
 <p>Tick every one-hour slot that suits you. You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
 <div id="grid"></div>
 <button id="submit">Submit</button>
@@ -51,6 +52,18 @@ if (!token || !/^\d{4}-\d{2}-\d{2}$/.test(start || '')) {
   document.getElementById('submit').hidden = true;
   msg.textContent = 'This link is incomplete. Please use the link you were sent.';
 } else {
+  fetch(`${SCRIPT_URL}?t=${encodeURIComponent(token)}`)
+    .then(r => r.json())
+    .then(out => {
+      if (out.ok) {
+        document.getElementById('greeting').textContent = `Hi ${out.name},`;
+      } else {
+        document.getElementById('submit').hidden = true;
+        msg.textContent = "This link isn't recognised. Please check you used the full link I sent.";
+      }
+    })
+    .catch(() => {});  // if the lookup fails, the form still works without a greeting
+
   const [y, m, d] = start.split('-').map(Number);
   const weeks = [[], []];
   for (let i = 0; i < 14; i++) {
