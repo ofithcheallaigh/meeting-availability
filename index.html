@@ -17,13 +17,19 @@
   #msg { margin-top: 1rem; font-weight: 600; }
   #grid { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem;  }
   #grid table { flex: 1 1 420px; margin-bottom: 0;  }
+  #note-label { display: block; font-weight: 600; margin-bottom: .4rem; }
+  #note { width: 100%; box-sizing: border-box; font: inherit; padding: .5rem; margin-bottom: 1.5rem; }
 </style>
 </head>
 <body>
 <h1>PhD Update Meeting Availability</h1>
 <p id="greeting"></p>
 <p>Tick every one-hour slot that suits you. You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
+
+<p>Please add a note using the text box below. You can also use this box to indicate that no available slot works for you.
 <div id="grid"></div>
+<label for="note" id="note-label">Please add a note if needed:</label>
+<textarea id="note" maxlength="500" rows="3"></textarea>
 <button id="submit">Submit</button>
 <p id="msg"></p>
 
@@ -101,7 +107,7 @@ if (!token || !/^\d{4}-\d{2}-\d{2}$/.test(start || '')) {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },  // avoids a CORS preflight Apps Script can't answer
-        body: JSON.stringify({ token, slots })
+        JSON.stringify({ token, slots, note: document.getElementById('note').value })
       });
       const out = await res.json();
       msg.textContent = out.ok ? 'Thanks, your availability has been recorded. I hope you have a good day.' : `Error: ${out.error}`;
