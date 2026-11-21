@@ -26,7 +26,7 @@
 <p id="greeting"></p>
 <p>Tick every one-hour slot that suits you. You can reopen this link and resubmit; your latest response replaces the earlier one.</p>
 
-<p>Please add a note using the text box below. You can also use this box to indicate that no available slot works for you.
+<p>Please add a note using the text box below if needed. The text box is also a good place indicate if you want a shorter meeting, a Teams call, or to say that no available slot works for you.
 <div id="grid"></div>
 <label for="note" id="note-label">Please add a note if needed:</label>
 <textarea id="note" maxlength="500" rows="3"></textarea>
@@ -49,7 +49,7 @@ const BLOCKED = new Set([
 		'2026-12-09 13:00',
 		'2026-12-09 14:00',
 		'2026-12-10 15:00',
-		'2026-12-10 16:00'
+		'2026-12-10 16:00',
 		]);
 const start = params.get('start') || DEFAULT_START;
 const msg = document.getElementById('msg');
